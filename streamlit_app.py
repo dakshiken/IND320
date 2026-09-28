@@ -20,13 +20,12 @@ st.sidebar.info(
 st.title("💧IND320💧")
 st.markdown(
     """
-        links to git and this app:
+    Use the sidebar to navigate between pages.
+
+    links to git and this app:
     - https://ind320-dakshi.streamlit.app
     - https://github.com/dakshiken/IND320
     
-    Use the sidebar to navigate between pages.
-
-
     """
 )
 
