@@ -1,0 +1,14 @@
+[theme]
+base = "dark"
+primaryColor = "#00ffc8"          
+backgroundColor = "#000000"
+secondaryBackgroundColor = "#303133"
+textColor = "#ffcc00"
+
+# always load on save
+[server]
+runOnSave = true
+
+# reduce racing conditions
+[runner]
+fastReruns = false
