@@ -18,8 +18,7 @@
 │   ├── data_loader.py
 │
 ├── notebooks/
-│   ├── documentatiom.ipynb
-│   ├── reservoirs.ipynb
+│   ├── project_work_part1.ipynb
 │
 ├── pages/
 │   ├── Page_2.py
@@ -29,4 +28,5 @@
 ├── .gitginore
 ├── README.md
 ├── requirements.txt
-└── streamlit_app.py
+├── streamlit_app.py
+└── video.ind320-kompresed.mp4
