@@ -1,51 +1,36 @@
 import pandas as pd
 import streamlit as st
 
-from modules.data_loader import load_data
+from modules.data_loader import AREA_TYPES, VALUE_COLS, load_data
 
-# Page configuration
-st.set_page_config(page_title="Data Table", page_icon="📊", layout="wide")
-
-# Page headers
-st.title("📊 Data Table")
+#page configuration
+st.set_page_config(page_title="Reservoir Table", page_icon="📊", layout="wide")
+st.title("📊  Reservoir Table  📊")
 st.markdown(
-    "One row per column of the imported CSV. **First month trend** shows a sparkline "
-    "of that column's values during the first calendar month of the series."
+    "data is downloaded live from the NVE Magasinstatistikk API. One row per area number. "
+    "each sparkline shows the first month of that area's series."
 )
 
-# Load data
-df = load_data()
+#EL (bidding zones), NO (whole country) or VASS (watercourse areas)
+area_type = st.radio("Area type", AREA_TYPES, horizontal=True)
+df = load_data(area_type=area_type)
 
-# Get numeric columns (exclude Date)
-value_cols = [c for c in df.columns if c != "Date"]
+#one row per area number, one sparkline column per data column
+rows = []
+for area, g in df.groupby("Area", sort=False):
+    first = g["Date"].min()
+    first_month = g[(g["Date"].dt.year == first.year) & (g["Date"].dt.month == first.month)]
+    row = {"Area": area, "First month": first.strftime("%Y-%m")}
+    row.update({col: first_month[col].tolist() for col in VALUE_COLS})
+    rows.append(row)
+summary_df = pd.DataFrame(rows)
 
-# Filter data for the first calendar month
-first_date = df["Date"].min()
-first_month_mask = (
-    (df["Date"].dt.year == first_date.year) & (df["Date"].dt.month == first_date.month)
-)
-first_month = df.loc[first_month_mask]
-
-# Create one row per column with lists for sparklines
-table_rows = [
-    {"Column": col, "First month trend": first_month[col].tolist()}
-    for col in value_cols
-]
-summary_df = pd.DataFrame(table_rows)
-
-# Display summary table with sparkline chart
 st.dataframe(
     summary_df,
-    column_config={
-        "First month trend": st.column_config.LineChartColumn(
-            "First month trend",
-            help=f"Weekly values from {first_date.date()} to {first_month['Date'].max().date()}",
-        )
-    },
+    column_config={col: st.column_config.LineChartColumn(col) for col in VALUE_COLS},
     hide_index=True,
-    use_container_width=True,
 )
 
-# Display raw dataset in expander
+#raw downloaded data in an expander
 with st.expander("Show raw imported data"):
-    st.dataframe(df, use_container_width=True)
+    st.dataframe(df)

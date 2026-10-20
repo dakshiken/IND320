@@ -2,21 +2,21 @@ import streamlit as st
 import random
 
 
-# Configure page settings
+#configure page settings
 st.set_page_config(
     page_title="IND320", page_icon="💧", layout="wide"
 )
 
-# Sidebar info
+#sidebar info
 st.sidebar.title("Navigation")
 st.sidebar.info(
     "Use the pages above to explore the other pages:\n\n"
-    "- **Page 2** — data loader\n"
-    "- **Page 3** — time series plot\n"
-    "- **Page 4** — test content"
+    "- **Page 2** — reservoir table \n"
+    "- **Page 3** — reservoir plot \n"
+    "- **Page 4** — cross border flows \n"
 )
 
-# Main page title and intro
+#main page title and intro
 st.title("💧IND320💧")
 st.markdown(
     """

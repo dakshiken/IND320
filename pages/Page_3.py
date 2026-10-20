@@ -1,62 +1,45 @@
-import matplotlib.pyplot as plt
 import streamlit as st
 
-from modules.data_loader import load_data
+from modules.data_loader import AREA_TYPES, VALUE_COLS, download_all, load_data
 
-# Page configuration
-st.set_page_config(page_title="Data Plot", page_icon="📈", layout="wide")
+#page configuration
+st.set_page_config(page_title="Reservoir Plot", page_icon="📈", layout="wide")
+st.title("📈  Reservoir Plot  📈")
 
-# Page title
-st.title("📈 Data Plot")
+#months that the API provides, used as the options of the slider
+months = sorted(download_all()["Date"].dt.to_period("M").astype(str).unique())
 
-# Load cached data
-df = load_data()
-
-# Get numeric value columns
-value_cols = [c for c in df.columns if c != "Date"]
-
-# UI layout for filter controls
-col1, col2 = st.columns([1, 2])
-
+#area type (radio), column (selectbox) and download interval (select_slider)
+col1, col2, col3 = st.columns([1, 1, 2])
 with col1:
-    # Dropdown for column selection
-    column_choice = st.selectbox("Column to plot", options=["All columns"] + value_cols)
-
+    area_type = st.radio("Area type", AREA_TYPES)
 with col2:
-    # Slider for month range (defaults to first month)
-    month_labels = sorted(df["Date"].dt.to_period("M").astype(str).unique())
-    start_month, end_month = st.select_slider(
-        "Month range", options=month_labels, value=(month_labels[0], month_labels[0])
+    column_choice = st.selectbox("Column to plot", ["All columns"] + VALUE_COLS)
+with col3:
+    #slider decides which months are loaded
+    start, end = st.select_slider(
+        "Download interval (months)", options=months,
+        value=(months[max(0, len(months) - 36)], months[-1]),
     )
 
-# Filter dataset by selected month range
-month_str = df["Date"].dt.to_period("M").astype(str)
-plot_df = df.loc[month_str.between(start_month, end_month)].set_index("Date")
+#only the chosen area type and months are loaded
+df = load_data(area_type, start, end)
+if df.empty:
+    st.warning("No data for this selection.")
+    st.stop()
 
-# Create plot figure
-fig, ax = plt.subplots(figsize=(10, 5))
-
-if column_choice == "All columns":
-    # Plot all normalized columns (0-1 scale)
-    normalized = (plot_df - plot_df.min()) / (plot_df.max() - plot_df.min())
-    for col in value_cols:
-        ax.plot(normalized.index, normalized[col], label=col, linewidth=1.2)
-    ax.set_ylabel("Normalised value (0-1)")
-    ax.legend(fontsize=8, loc="upper left")
-    title = "All columns (min-max normalised)"
+if column_choice != "All columns":
+    #one line for each area number
+    st.subheader(f"{column_choice}, {start} to {end}")
+    wide = df.pivot_table(index="Date", columns="Area", values=column_choice)
+    st.line_chart(wide, x_label="Date", y_label=column_choice)
 else:
-    # Plot single selected column
-    ax.plot(plot_df.index, plot_df[column_choice], color="tab:blue", linewidth=1.5)
-    ax.set_ylabel(column_choice)
-    title = column_choice
+    #one chart per area number with all columns min-max scaled to 0-1.
+    #constant column (range 0) gets range 1, so the line stays at 0 instead of disappearing.
+    for area, g in df.groupby("Area", sort=False):
+        g = g.set_index("Date")[VALUE_COLS]
+        rng = (g.max() - g.min()).replace(0, 1)
+        st.subheader(f"{area}: all columns (normalised), {start} to {end}")
+        st.line_chart((g - g.min()) / rng, x_label="Date", y_label="Normalised value (0-1)")
 
-# Format plot title, labels, and grid
-ax.set_title(f"Norwegian national reservoir series — {title}\n({start_month} to {end_month})")
-ax.set_xlabel("Date")
-ax.grid(alpha=0.3)
-fig.autofmt_xdate()
-fig.tight_layout()
-
-# Render plot and caption in Streamlit
-st.pyplot(fig)
-st.caption(f"Showing {len(plot_df)} weekly observations between {start_month} and {end_month}.")
+st.caption(f"Showing {df['Date'].nunique()} weekly observations for {df['Area'].nunique()} area(s) between {start} and {end}.")
