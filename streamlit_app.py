@@ -9,11 +9,11 @@ st.set_page_config(page_title="IND320", page_icon="💧", layout="wide")
 st.sidebar.title("Navigation")
 st.sidebar.info(
     "Use the pages above to explore the other pages:\n\n"
-    "- **Page 2** — reservoir table (NVE API)\n"
-    "- **Page 3** — reservoir plot (NVE API)\n"
-    "- **Page 4** — STL and spectrogram (NVE API)\n"
-    "- **Page 5** — weather outliers and anomalies (Open-Meteo API)\n"
-    "- **Page 6** — cross-border flows (MongoDB)"
+    "- **Page 2** - reservoir table (NVE API)\n"
+    "- **Page 3** - reservoir plot (NVE API)\n"
+    "- **Page 4** - STL and spectrogram (NVE API)\n"
+    "- **Page 5** - weather outliers and anomalies (Open Meteo API)\n"
+    "- **Page 6** - cross border flows (MongoDB)"
 )
 
 #main page title and intro
