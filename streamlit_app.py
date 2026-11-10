@@ -1,44 +1,46 @@
 import streamlit as st
-import random
 
-
-#configure page settings
+# page configuration (each page file can set its own as well)
 st.set_page_config(page_title="IND320", page_icon="💧", layout="wide")
 
-#sidebar info
-st.sidebar.title("Navigation")
-st.sidebar.info(
-    "Use the pages above to explore the other pages:\n\n"
-    "- **Page 2** - reservoir table (NVE API)\n"
-    "- **Page 3** - reservoir plot (NVE API)\n"
-    "- **Page 4** - STL and spectrogram (NVE API)\n"
-    "- **Page 5** - weather outliers and anomalies (Open Meteo API)\n"
-    "- **Page 6** - cross border flows (MongoDB)"
-)
+# group -> (icon, data source, [(page file, title, icon), ...])
+MENU = {
+    "Reservoirs": ("💧", "NVE Magasinstatistikk API", [
+        ("pages/Page_2.py", "Reservoir table", "📊"),
+        ("pages/Page_3.py", "Reservoir plot", "📈"),
+        ("pages/Page_4.py", "STL and spectrogram", "🌊"),
+    ]),
+    "Weather": ("🌦️", "Open-Meteo API", [
+        ("pages/Page_5.py", "Outliers and anomalies", "🌦️"),
+    ]),
+    "Energy flows": ("⚡", "ENTSO-E data in MongoDB", [
+        ("pages/Page_6.py", "Cross-border flows", "💦"),
+    ]),
+}
 
-#main page title and intro
-st.title("💧IND320💧")
-st.markdown(
-    """
-    Use the sidebar to navigate between pages.
+# every file becomes an st.Page, and the built-in menu is hidden
+home = st.Page("pages/Page_1.py", title="Home", icon="🏠", default=True)
+groups = {g: [st.Page(f, title=t, icon=i) for f, t, i in items] for g, (_, _, items) in MENU.items()}
+pg = st.navigation([home] + [p for items in groups.values() for p in items], position="hidden")
 
-    links to git and this app:
-    - https://ind320-dakshi.streamlit.app
-    - https://github.com/dakshiken/IND320
-    
-    """
-)
 
-#falling emojis using injected CSS animation
+def nav_button(page):
+    # one button per page, the current page is highlighted
+    if st.button(page.title, icon=page.icon, key=page.title, width="stretch",
+                 type="primary" if page.title == pg.title else "secondary"):
+        st.switch_page(page)
 
-emoji = "Welcome 👋"
-count = random.randint(3, 15)
-spans = "".join(
-    f'<span class="e" style="left:{random.randint(5, 95)}%; animation-delay:{random.uniform(0, 1):.1f}s">{emoji}</span>'
-    for _ in range(count)
-)
 
-st.markdown(
-    f"<style>@keyframes d{{to{{top:100vh;opacity:0}}}}.e{{position:fixed;top:0;font-size:36px;animation:d 3s forwards}}</style>{spans}",
-    unsafe_allow_html=True,
-)
+# our own sidebar: title, home button, one expander per group
+with st.sidebar:
+    st.title("💧 IND320")
+    nav_button(home)
+    for group, (icon, source, _) in MENU.items():
+        with st.expander(f"{icon} {group}", expanded=True):
+            st.caption(source)
+            for page in groups[group]:
+                nav_button(page)
+    st.divider()
+    st.caption("[GitHub](https://github.com/dakshiken/IND320) · [Streamlit app](https://ind320-dakshi.streamlit.app)")
+
+pg.run()   # run the chosen page
