@@ -1,0 +1,18 @@
+{
+  "p": 2,
+  "d": 0,
+  "q": 1,
+  "m": 52,
+  "sp": 1,
+  "sd": 0,
+  "sq": 0,
+  "history": 260,
+  "epochs": 10,
+  "lr": 0.002,
+  "exog": [
+    "temperature_2m",
+    "precipitation",
+    "snowfall"
+  ],
+  "future": "seasonal"
+}

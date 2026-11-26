@@ -1,11 +1,11 @@
-#loads the nve reservoir statistics directly from the NVE API (replaces the CSV file)
+# NVE reservoir statistics, downloaded from the NVE API
 import pandas as pd
 import requests
 import streamlit as st
 
 BASE = "https://biapi.nve.no/magasinstatistikk/api/Magasinstatistikk"
 
-# norsk to english names
+# Norwegian to English column names
 RENAME = {
     "dato_Id": "Date",
     "omrType": "Area Type",
@@ -18,7 +18,7 @@ RENAME = {
 }
 VALUE_COLS = ["Fill Degree", "Capacity (TWh)", "Fill Volume (TWh)",
               "Fill Degree Previous Week", "Change in Fill Degree"]
-AREA_TYPES = ["EL", "NO", "VASS"]   # bidding zones, whole country, watercourse areas
+AREA_TYPES = ["EL", "NO", "VASS"]   # price areas, Norway, water areas
 
 
 @st.cache_data(ttl=3600, show_spinner="Downloading data from the NVE API ...")
@@ -28,12 +28,12 @@ def download_all() -> pd.DataFrame:
     resp.raise_for_status()
     df = pd.DataFrame(resp.json()).rename(columns=RENAME)
     df["Date"] = pd.to_datetime(df["Date"])
-    #label per area
+    # label per area
     df["Area"] = (df["Area Type"] + " " + df["Area Number"].astype(str)).replace({"NO 0": "Norway"})
     columns = ["Date", "Area Type", "Area Number", "Area"] + VALUE_COLS
     return df[columns].sort_values(["Area Type", "Area Number", "Date"]).reset_index(drop=True)
 
-# data for one area type and a download interval
+# data for one area type and, if given, a month interval
 def load_data(area_type=None, start=None, end=None) -> pd.DataFrame:
 
     df = download_all()

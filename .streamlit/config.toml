@@ -1,14 +1,18 @@
+# same colours as modules/theme.py
 [theme]
 base = "dark"
-primaryColor = "#00ffc8"          
-backgroundColor = "#000000"
-secondaryBackgroundColor = "#303133"
-textColor = "#ffcc00"
+primaryColor = "#E3935F"
+backgroundColor = "#171514"
+secondaryBackgroundColor = "#211E1C"
+textColor = "#EEE7DC"
+linkColor = "#E8D08C"
+borderColor = "#34302C"
+baseRadius = "0.5rem"
+font = "sans serif"
 
-# always load on save
-[server]
-runOnSave = true
+[theme.sidebar]
+backgroundColor = "#1D1A18"
+secondaryBackgroundColor = "#262220"
 
-# reduce racing conditions
-[runner]
-fastReruns = false
+[client]
+toolbarMode = "minimal"
