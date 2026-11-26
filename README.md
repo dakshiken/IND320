@@ -9,27 +9,44 @@ IND320
 │   └── sample_points.json
 │
 ├── modules/
-│   ├── analysis.py
-│   ├── data_loader.py
-│   ├── mongo.py
-│   └── weather.py
+│   ├── analysis.py              
+│   ├── app_data.py             
+│   ├── currency.py              
+│   ├── data_loader.py           
+│   ├── forecast.py             
+│   ├── guide.py                 
+│   ├── menu.py                  
+│   ├── mongo.py                 
+│   ├── state.py                 
+│   ├── theme.py                
+│   └── weather.py               
+│
 │
 ├── notebooks/
+    ├── images/
+│   │    ├── IMG_1223.jpg
+│   │    └── IMG_1224.jpg
 │   ├── project_work_part1.ipynb
 │   ├── project_work_part2.ipynb
-│   └── project_work_part3.ipynb
+│   ├── project_work_part3.ipynb
+│   └── project_work_part4.ipynb
 │
-├── pages/
-│   ├── Page_2.py
-│   ├── Page_3.py
-│   ├── Page_4.py
-│   ├── Page_5.py
-│   └── Page_6.py
+├── views/
+│   ├── home.py                 
+│   ├── reservoirs.py 
+│   ├──  flows.py   
+│   ├──exchange_rates.py
+│   ├── seasonality.py  
+│   ├── weather_anomalies.py  
+│   ├── correlation.py
+│   └── forecast.py
+│
 │
 ├── video/
 │   ├── video.ind320-kompresed- part 1.mp4
 │   ├── video.ind320-kompresed- part 2.mp4
-│   └── video.ind320-kompresed- part 3.mp4
+│   ├── video.ind320-kompresed- part 3.mp4
+│   └── video.ind320-kompresed- part 4.mp4
 │
 ├── .gitignore
 ├── README.md
