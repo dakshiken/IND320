@@ -11,16 +11,6 @@ GLOSSARY = [
     ("Water area (VASS 1 to 3)", "Three watercourse areas (river basins) that NVE uses for the reservoir statistics."),
     ("TWh, GWh, MW", "Units for energy and power. 1 TWh = 1,000 GWh. A reservoir holds energy in TWh. MW tells how much power flows at one moment."),
     ("Time frame", "The first and the last month that you look at."),
-    ("Weather property", "One kind of weather data, for example temperature, rain or wind speed. It is the average over random places in the area."),
-    ("Trend and season (STL)", "A way to split a curve in a slow long-term change (trend), a pattern that repeats every year (season) and what is left over (residual)."),
-    ("Outlier and anomaly", "A value that is very different from what is normal. SPC and LOF are two different methods to find them."),
-    ("Correlation", "A number from -1 to 1 that tells if two curves move together. 1 = they rise and fall together, 0 = no link, -1 = when one rises the other falls. It does not prove that one causes the other."),
-    ("Lag", "A shift in time. With a lag of 4 weeks the weather of one week is compared with the reservoirs four weeks later."),
-    ("Forecast", "A calculated guess about the coming weeks, made by a model that has learned from the past."),
-    ("Back-test", "A forecast of a period that has already happened, so the forecast can be compared with what really happened."),
-    ("Interval", "A band around the forecast. The real value should be inside the band in about 8 of 10 cases."),
-    ("Mean absolute error", "The average size of the mistake of a forecast. On the fill degree scale 0.10 means that the forecast is on average 10 percentage points wrong. Lower is better."),
-    ("Extra data (exogenous variables)", "Other data, such as weather or exchange rates, that the model gets as hints."),
 ]
 
 
