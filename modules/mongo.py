@@ -7,7 +7,7 @@ from pymongo.server_api import ServerApi
 
 
 def _uri() -> str:
-    #Connection string from Streamlit secrets
+    # connection string from Streamlit secrets or the environment
     try:
         return st.secrets["MONGO_URI"]
     except Exception:
@@ -19,21 +19,21 @@ def _uri() -> str:
 
 @st.cache_resource
 def get_collection():
-#one shared MongoDB connection for the whole app.
+    # one shared connection
     client = MongoClient(_uri(), server_api=ServerApi("1"), serverSelectionTimeoutMS=10000)
     return client["ind320"]["crossborder_flows"]
 
 
 @st.cache_data(ttl=3600)
 def get_options():
-#connections and years that exist in the database.
+    """Connections and years in the database."""
     collection = get_collection()
     return sorted(collection.distinct("connection")), sorted(collection.distinct("year"))
 
 
 @st.cache_data(ttl=3600)
 def get_totals(connection, year) -> dict:
-#total flow in GWh per direction
+    """Total flow per direction in GWh."""
     docs = get_collection().find({"connection": connection, "year": year}, {"_id": 0, "direction": 1, "mw": 1})
     totals = {}
     for d in docs:
@@ -43,8 +43,8 @@ def get_totals(connection, year) -> dict:
 
 @st.cache_data(ttl=3600)
 def get_flows(year, months) -> pd.DataFrame:
-    """hourly flow in the chosen months, one column per, norsk local time as index.
-    hgours outside the chosen months are NaN, so a line plot breaks between months that are not next to each other."""
+    """Hourly flow in the chosen months, one column per connection and direction, Norwegian time as index.
+    Hours outside the chosen months are NaN, so a line plot breaks between months that are not next to each other."""
     docs = get_collection().find({"year": year, "month": {"$in": list(months)}},
                                  {"_id": 0, "connection": 1, "direction": 1, "ts": 1, "mw": 1})
     rows = [(d["connection"], d["direction"], t, v) for d in docs for t, v in zip(d["ts"], d["mw"])]
@@ -53,3 +53,16 @@ def get_flows(year, months) -> pd.DataFrame:
     wide = wide.reindex(pd.date_range(wide.index.min(), wide.index.max(), freq="h"))
     wide.index = wide.index.tz_localize("UTC").tz_convert("Europe/Oslo").tz_localize(None)
     return wide
+
+
+@st.cache_data(ttl=3600)
+def get_net_flow() -> pd.DataFrame:
+    """Net export (out of Norway minus into Norway, summed over all connections) per hour in MW, local time.
+    Used as an exogenous variable in the forecast."""
+    docs = get_collection().find({}, {"_id": 0, "direction": 1, "ts": 1, "mw": 1})
+    rows = [(d["direction"], t, v) for d in docs for t, v in zip(d["ts"], d["mw"])]
+    df = pd.DataFrame(rows, columns=["direction", "ts", "mw"])
+    total = df.pivot_table(index="ts", columns="direction", values="mw", aggfunc="sum").fillna(0)   # ts is UTC
+    net = (total.get("out", 0) - total.get("in", 0)).rename("net_export_MW").to_frame()
+    net.index = net.index.tz_localize("UTC").tz_convert("Europe/Oslo").tz_localize(None)
+    return net
